@@ -45,6 +45,7 @@ kuikly-login-sdk-demo/
 └── docs/                           # 文档
     ├── INTEGRATION.md              # 本文档
     ├── ARCHITECTURE.md             # 架构详解
+    ├── PERFORMANCE.md              # 性能对比（Kuikly vs Flutter vs H5）
     └── THIRD_PARTY_AUTH.md         # 第三方登录接入指南
 ```
 
@@ -249,14 +250,14 @@ LoginSDK.init(LoginConfig(appId = "...", authApi = KtorAuthApi("https://api.exam
 
 ## 6. Kuikly 正式接入路径
 
-当前 Demo 的 `LoginActivity` 使用 Android 原生 XML 渲染 UI。迁移到 Kuikly 时：
+当前 Demo 的 `LoginActivity` 使用 **Jetpack Compose** 渲染 UI。迁移到 Kuikly 时：
 
 ### 6.1 UI 迁移
 
 | 现在（预演） | 正式（Kuikly） |
 |-------------|---------------|
-| `LoginActivity` + XML | `@Page` Kuikly Compose Page |
-| `lifecycleScope.collect` | Kuikly 响应式绑定 |
+| `LoginActivity` + Jetpack Compose | `@Page` Kuikly Compose Page |
+| `collectAsStateWithLifecycle` | Kuikly 响应式绑定 |
 | `LoginUiContract` | **保持不变** |
 
 ### 6.2 宿主容器接入
@@ -284,7 +285,7 @@ rootView.addView(kuiklyView)
 ### 6.3 推荐演进路线
 
 ```
-Phase 1（当前）  Android 原生 UI + KMP SDK 逻辑
+Phase 1（当前）  Android Jetpack Compose UI + KMP SDK 逻辑
 Phase 2          登录页 UI 迁移至 Kuikly Page，SDK API 不变
 Phase 3          发布 login-sdk AAR + XCFramework，iOS/鸿蒙宿主接入
 Phase 4          个人中心页面逐步迁移 Kuikly，原生仅保留壳
@@ -348,6 +349,22 @@ implementation(files("libs/login-sdk-release.aar"))
 
 ---
 
+## 8. 性能对比（vs Flutter / H5）
+
+登录 SDK 场景下，Kuikly/KMP 路线在**包体、冷启动、交互响应、内存**方面通常优于 Flutter Module 和 H5 WebView SDK；跨端 UI 一致性上 Flutter / H5 更强，但登录页场景收益有限。
+
+**核心结论：**
+
+| 方案 | 优势 | 劣势 |
+|------|------|------|
+| **Kuikly / KMP** | 原生渲染、体积小、启动快、鸿蒙支持好 | 生态小于 Flutter |
+| **Flutter Module** | UI 一致性最好 | Engine 重（+3~8MB），嵌入多宿主包体惩罚大 |
+| **H5 WebView** | 体积最小、H5 团队零学习成本 | 启动慢、交互差、第三方回调不稳定 |
+
+详细对比（含评分表、Benchmark 计划）：见 **[PERFORMANCE.md](./PERFORMANCE.md)**
+
+---
+
 ## 9. 常见问题
 
 ### Q1：前期只做 Android，后期加 iOS 改动大吗？
@@ -388,4 +405,5 @@ lifecycleScope.launch {
 - [Kuikly Android 工程接入](https://kuikly.tds.qq.com/QuickStart/android.html)
 - [Kuikly GitHub](https://github.com/Tencent-TDS/KuiklyUI)
 - 本工程架构详解：`docs/ARCHITECTURE.md`
+- 性能对比分析：`docs/PERFORMANCE.md`
 - 第三方登录接入：`docs/THIRD_PARTY_AUTH.md`

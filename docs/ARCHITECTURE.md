@@ -122,7 +122,7 @@ com.example.login.sdk.internal     # Repository、Registry 实现、Mock
 
 | 集成点 | 预演实现 | Kuikly 正式实现 |
 |--------|----------|----------------|
-| 登录 UI | Android XML Activity | `@Page("login")` Compose Page |
+| 登录 UI | Jetpack Compose Activity | `@Page("login")` Kuikly Compose Page |
 | UI 状态 | `StateFlow` + collect | Kuikly 响应式 `observable` |
 | 页面路由 | Intent 跳转 | `RouterModule` / `@Page` KSP 路由 |
 | 平台能力 | `ThirdPartyAuthLauncher` | Kuikly `Module` 机制 |
@@ -189,3 +189,17 @@ Repository 层捕获异常并映射为 `AuthResult.Failure(code, message)`，Con
 ```bash
 ./gradlew :login-sdk:cleanAllTests :login-sdk:allTests
 ```
+
+---
+
+## 8. 性能与选型
+
+本预演工程定位为**可嵌入的登录 SDK**，性能对比重点不是整 App 渲染帧率，而是 SDK 体积、冷启动、交互响应与第三方授权链路。
+
+与 Flutter Module、H5 WebView SDK 的完整对比见 **[PERFORMANCE.md](./PERFORMANCE.md)**。
+
+**架构层结论：**
+
+- Kuikly/KMP 走原生渲染，无 Flutter Engine、无 WebView JS 桥，登录页冷启动与内存最接近原生
+- 第三方登录（微信 / Apple / Google）三方案均跳转原生 SDK，差异主要在回调可靠性（H5 最弱）
+- 正式立项后建议补 B1~B5 Benchmark（见 PERFORMANCE.md §7）

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -16,7 +17,7 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
+        compose = true
     }
 
     compileOptions {
@@ -31,9 +32,12 @@ android {
 
 dependencies {
     implementation(project(":login-sdk"))
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.lifecycle.runtime)
-    implementation(libs.appcompat)
-    implementation(libs.material)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
     implementation(libs.kotlinx.coroutines.android)
+    debugImplementation("androidx.compose.ui:ui-tooling")
 }
