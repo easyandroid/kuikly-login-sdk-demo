@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.LoginHost" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">#1976D2</item>
+    </style>
+</resources>
