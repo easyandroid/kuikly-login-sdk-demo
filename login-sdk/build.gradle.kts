@@ -64,6 +64,12 @@ android {
         minSdk = 24
     }
 
+    sourceSets {
+        getByName("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        }
+    }
+
     buildFeatures {
         compose = true
     }
