@@ -53,6 +53,10 @@ Demo 账号（预填）：手机 `13800138000` / 验证码 `123456`
 
 在工程根目录执行 `gradle wrapper`，确保存在 `gradlew` 和 `gradle/wrapper/gradle-wrapper.jar`。
 
+### Xcode 提示 project is damaged / parse error
+
+多为 `project.pbxproj` 中对象 ID 格式非法（须为 **24 位十六进制**）。请 `git pull` 最新代码后重新打开 `ios-host.xcodeproj`。
+
 ### embedAndSignAppleFrameworkForXcode 失败
 
 - 确认已安装 **Xcode** 与 **Command Line Tools**
