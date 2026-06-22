@@ -8,5 +8,6 @@ local.properties
 # iOS / Xcode
 ios-host/Configuration/TeamID.xcconfig
 **/xcuserdata/
+*.xcodeproj/project.xcworkspace/
 *.xcuserstate
 DerivedData/

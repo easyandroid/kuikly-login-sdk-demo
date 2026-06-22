@@ -1,0 +1,6 @@
+# Xcode / Apple project files must use LF (CRLF breaks workspace parsing on macOS)
+*.pbxproj text eol=lf
+*.xcscheme text eol=lf
+*.xcworkspacedata text eol=lf
+*.xcconfig text eol=lf
+*.plist text eol=lf

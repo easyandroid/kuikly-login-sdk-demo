@@ -10,10 +10,12 @@
    cd kuikly-login-sdk-demo
    gradle wrapper
    ```
-3. 用 Xcode 打开：
+3. 用 Xcode 打开 **工程包**（不要打开 `contents.xcworkspacedata` 文件）：
+   ```bash
+   cd kuikly-login-sdk-demo
+   open ios-host/ios-host.xcodeproj
    ```
-   ios-host/ios-host.xcodeproj
-   ```
+   首次打开时 Xcode 会自动生成 `project.xcworkspace`（已在 `.gitignore`，勿手动提交）。
 4. 选择 **iPhone 模拟器**（如 iPhone 15）
 5. 点击 **Run (▶)**
 
@@ -56,6 +58,16 @@ Demo 账号（预填）：手机 `13800138000` / 验证码 `123456`
 ### Xcode 提示 project is damaged / parse error
 
 多为 `project.pbxproj` 中对象 ID 格式非法（须为 **24 位十六进制**）。请 `git pull` 最新代码后重新打开 `ios-host.xcodeproj`。
+
+### Could not open workspace / contents.xcworkspacedata
+
+1. **务必打开** `ios-host.xcodeproj`（蓝色图标），不要双击 `contents.xcworkspacedata`。
+2. 若仍失败，删除本地自动生成的 workspace 后重开：
+   ```bash
+   rm -rf ios-host/ios-host.xcodeproj/project.xcworkspace
+   open ios-host/ios-host.xcodeproj
+   ```
+3. `git pull` 最新代码（仓库不再提交 `project.xcworkspace`，由 Xcode 本地生成）。
 
 ### embedAndSignAppleFrameworkForXcode 失败
 
