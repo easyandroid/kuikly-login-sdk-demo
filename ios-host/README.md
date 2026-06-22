@@ -85,6 +85,23 @@ chmod +x gradlew
 open ios-host/ios-host.xcodeproj
 ```
 
+### gradle-wrapper.jar 没有主清单 / No main manifest attribute
+
+仓库内 `gradle-wrapper.jar` 的 MANIFEST 不含 `Main-Class`，**不要用 `java -jar`**，请用：
+
+```bash
+$JAVA_HOME/bin/java -Xmx64m -Xms64m \
+  -classpath gradle/wrapper/gradle-wrapper.jar \
+  org.gradle.wrapper.GradleWrapperMain \
+  :login-sdk:embedAndSignAppleFrameworkForXcode \
+  -PXCODE_CONFIGURATION=Debug \
+  -PXCODE_SDK_NAME=iphonesimulator \
+  -PXCODE_ARCHS=arm64 \
+  --no-daemon
+```
+
+或直接：`./scripts/build-ios-framework.sh`（已内置正确启动方式）。
+
 ### Build Phase 报 gradlew not found
 
 在工程根目录执行 `gradle wrapper`，确保存在 `gradlew` 和 `gradle/wrapper/gradle-wrapper.jar`。

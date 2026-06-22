@@ -15,8 +15,10 @@ run_gradle() {
   if [ ! -f "$WRAPPER_JAR" ]; then
     die "缺少 $WRAPPER_JAR，请 git pull 获取完整仓库"
   fi
-  # 直接 java -jar，不经过 gradlew（避免 CRLF / 旧脚本导致 -Xmx64m 报错）
-  "$JAVA_HOME/bin/java" -Xmx64m -Xms64m -jar "$WRAPPER_JAR" "$@"
+  # 仓库内 wrapper.jar 无 Main-Class，须指定主类启动
+  "$JAVA_HOME/bin/java" -Xmx64m -Xms64m \
+    -classpath "$WRAPPER_JAR" \
+    org.gradle.wrapper.GradleWrapperMain "$@"
 }
 
 # --- JDK 17 ---
