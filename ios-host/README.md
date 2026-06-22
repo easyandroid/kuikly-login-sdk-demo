@@ -57,7 +57,14 @@ Demo 账号（预填）：手机 `13800138000` / 验证码 `123456`
 
 ### Xcode 提示 project is damaged / parse error
 
-多为 `project.pbxproj` 中对象 ID 格式非法（须为 **24 位十六进制**）。请 `git pull` 最新代码后重新打开 `ios-host.xcodeproj`。
+1. `git pull` 最新代码（已修复 `project.pbxproj` 中 `${CONFIGURATION}` 等导致解析失败的问题）。
+2. 清理本地缓存后重开：
+   ```bash
+   rm -rf ios-host/ios-host.xcodeproj/project.xcworkspace
+   rm -rf ~/Library/Developer/Xcode/DerivedData/ios-host-*
+   open ios-host/ios-host.xcodeproj
+   ```
+3. 不要手动编辑 `project.pbxproj`；Shell 脚本里勿写 `${VAR}` 花括号（须用 `$VAR`）。
 
 ### Could not open workspace / contents.xcworkspacedata
 
