@@ -4,10 +4,19 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+WRAPPER_JAR="$ROOT/gradle/wrapper/gradle-wrapper.jar"
 
 die() {
   echo "error: $*" >&2
   exit 1
+}
+
+run_gradle() {
+  if [ ! -f "$WRAPPER_JAR" ]; then
+    die "缺少 $WRAPPER_JAR，请 git pull 获取完整仓库"
+  fi
+  # 直接 java -jar，不经过 gradlew（避免 CRLF / 旧脚本导致 -Xmx64m 报错）
+  "$JAVA_HOME/bin/java" -Xmx64m -Xms64m -jar "$WRAPPER_JAR" "$@"
 }
 
 # --- JDK 17 ---
@@ -29,8 +38,9 @@ if [ -z "${JAVA_HOME:-}" ] || [ ! -x "$JAVA_HOME/bin/java" ]; then
 fi
 
 if [ -z "${JAVA_HOME:-}" ] || [ ! -x "$JAVA_HOME/bin/java" ]; then
-  die "未找到 JDK 17。请执行: brew install openjdk@17
-然后: export JAVA_HOME=\$(/usr/libexec/java_home -v 17)"
+  die "未找到 JDK 17。请执行:
+  brew install openjdk@17
+  export JAVA_HOME=\$(/usr/libexec/java_home -v 17)"
 fi
 
 JAVA_VERSION=$("$JAVA_HOME/bin/java" -version 2>&1 | head -n 1)
@@ -39,7 +49,7 @@ echo "Java: $JAVA_VERSION"
 case "$JAVA_VERSION" in
   *\"17.*|*\"21.*) ;;
   *)
-    echo "warning: 推荐使用 JDK 17（当前可能不兼容）"
+    die "当前不是 JDK 17/21，Gradle 可能失败。请: brew install openjdk@17 && export JAVA_HOME=\$(/usr/libexec/java_home -v 17)"
     ;;
 esac
 
@@ -49,23 +59,16 @@ if [ ! -f "$ROOT/local.properties" ]; then
     echo "sdk.dir=$HOME/Library/Android/sdk" > "$ROOT/local.properties"
     echo "Created local.properties"
   else
-    die "未找到 Android SDK。请先安装 Android Studio（装完不必打开）:
-  https://developer.android.com/studio
-安装后 SDK 通常在 ~/Library/Android/sdk
-然后执行: echo \"sdk.dir=\$HOME/Library/Android/sdk\" >> local.properties"
+    die "未找到 Android SDK，请先安装 Android Studio"
   fi
 fi
-
-chmod +x ./gradlew
-# 去掉可能存在的 Windows 换行
-sed -i '' 's/\r$//' ./gradlew 2>/dev/null || sed -i 's/\r$//' ./gradlew 2>/dev/null || true
 
 CONFIG="${1:-Debug}"
 SDK_NAME="${2:-iphonesimulator}"
 ARCHS="${3:-arm64}"
 
 echo "Building LoginSdk.framework ($CONFIG / $SDK_NAME / $ARCHS) ..."
-./gradlew :login-sdk:embedAndSignAppleFrameworkForXcode \
+run_gradle :login-sdk:embedAndSignAppleFrameworkForXcode \
   -PXCODE_CONFIGURATION="$CONFIG" \
   -PXCODE_SDK_NAME="$SDK_NAME" \
   -PXCODE_ARCHS="$ARCHS" \
