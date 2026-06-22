@@ -2,6 +2,18 @@
 
 ## 要在 Xcode 跑吗？
 
+### 0. 一次性环境（Mac）
+
+| 依赖 | 安装方式 |
+|------|----------|
+| **JDK 17** | `brew install openjdk@17` |
+| **Android SDK** | 安装 [Android Studio](https://developer.android.com/studio)（**不必打开**），SDK 在 `~/Library/Android/sdk` |
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+echo "sdk.dir=$HOME/Library/Android/sdk" >> local.properties   # 装完 Android Studio 后
+```
+
 **推荐用 Xcode**（最直接）：
 
 1. Mac 上拉代码
