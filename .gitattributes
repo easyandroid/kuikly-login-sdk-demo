@@ -4,3 +4,5 @@
 *.xcworkspacedata text eol=lf
 *.xcconfig text eol=lf
 *.plist text eol=lf
+gradlew text eol=lf
+*.sh text eol=lf

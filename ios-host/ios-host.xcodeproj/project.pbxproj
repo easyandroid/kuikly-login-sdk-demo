@@ -144,10 +144,11 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/../login-sdk/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)/LoginSdk.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\nset -e\ncd \"$SRCROOT/..\"\nif [ -x \"./gradlew\" ]; then\n  GRADLE=./gradlew\nelif command -v gradle >/dev/null 2>&1; then\n  GRADLE=gradle\nelse\n  echo \"error: gradlew or gradle not found. Run 'gradle wrapper' in project root.\"\n  exit 1\nfi\n\"$GRADLE\" :login-sdk:embedAndSignAppleFrameworkForXcode -PXCODE_CONFIGURATION=\"$CONFIGURATION\" -PXCODE_SDK_NAME=\"$SDK_NAME\" -PXCODE_ARCHS=\"$ARCHS\" --no-daemon\n";
+			shellScript = "set -e\nFRAMEWORK_PATH=\"$SRCROOT/../login-sdk/build/xcode-frameworks/$CONFIGURATION/$SDK_NAME/LoginSdk.framework\"\nif [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ] && [ -d \"$FRAMEWORK_PATH\" ]; then\n  echo \"Skipping Gradle: framework already exists.\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\nif [ -x \"./gradlew\" ]; then\n  GRADLE=./gradlew\nelif command -v gradle >/dev/null 2>&1; then\n  GRADLE=gradle\nelse\n  echo \"error: gradlew not found. Run: chmod +x gradlew && ./scripts/build-ios-framework.sh\"\n  exit 1\nfi\nchmod +x ./gradlew 2>/dev/null || true\nif command -v /usr/libexec/java_home >/dev/null 2>&1; then\n  export JAVA_HOME=\"${JAVA_HOME:-$(/usr/libexec/java_home -v 17 2>/dev/null || /usr/libexec/java_home)}\"\nfi\n\"$GRADLE\" :login-sdk:embedAndSignAppleFrameworkForXcode -PXCODE_CONFIGURATION=\"$CONFIGURATION\" -PXCODE_SDK_NAME=\"$SDK_NAME\" -PXCODE_ARCHS=\"$ARCHS\" --no-daemon\nif [ ! -d \"$FRAMEWORK_PATH\" ]; then\n  echo \"error: Gradle finished but framework missing at $FRAMEWORK_PATH\"\n  exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

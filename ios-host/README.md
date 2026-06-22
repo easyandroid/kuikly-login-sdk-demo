@@ -5,21 +5,26 @@
 **推荐用 Xcode**（最直接）：
 
 1. Mac 上拉代码
-2. 首次生成 Gradle Wrapper（若缺失）：
+2. 安装 **JDK 17**、**Android SDK**（KMP 编 iOS Framework 仍需 Gradle 配置 android 模块，可用 Android Studio 或只装 Command Line Tools + SDK）
+3. 配置 `local.properties`（若无 Android Studio 自动生成的）：
    ```bash
-   cd kuikly-login-sdk-demo
-   gradle wrapper
+   echo "sdk.dir=$HOME/Library/Android/sdk" >> local.properties
    ```
-3. 用 Xcode 打开 **工程包**（不要打开 `contents.xcworkspacedata` 文件）：
+4. **先预构建 Kotlin Framework**（首次必做，避免 Xcode 报找不到 `LoginSdk` / `LoginSDK`）：
    ```bash
    cd kuikly-login-sdk-demo
+   chmod +x gradlew scripts/build-ios-framework.sh
+   export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+   ./scripts/build-ios-framework.sh
+   ```
+   Intel Mac 模拟器若失败，可试：`./scripts/build-ios-framework.sh Debug iphonesimulator x86_64`
+5. 用 Xcode 打开工程包：
+   ```bash
    open ios-host/ios-host.xcodeproj
    ```
-   首次打开时 Xcode 会自动生成 `project.xcworkspace`（已在 `.gitignore`，勿手动提交）。
-4. 选择 **iPhone 模拟器**（如 iPhone 15）
-5. 点击 **Run (▶)**
+6. 选择 **iPhone 模拟器** → **Run (▶)**
 
-首次编译会执行 Build Phase **「Compile Kotlin Framework」**，自动调用 Gradle 构建 `LoginSdk.framework`，稍等几分钟。
+首次在 Xcode 内编译仍会执行 Build Phase **「Compile Kotlin Framework」**；若 Framework 已存在会跳过 Gradle，直接编 Swift。
 
 **也可以用 Android Studio（Mac 版）**：打开工程根目录，配置 iOS Run Configuration 指向 `ios-host`，但首次配置比 Xcode 麻烦，**建议先用 Xcode**。
 
@@ -50,6 +55,23 @@ Demo 账号（预填）：手机 `13800138000` / 验证码 `123456`
 ---
 
 ## 常见问题
+
+### 找不到 `LoginSdk` / `LoginSDK` / `import LoginSdk`
+
+Swift 侧应写 `import LoginSdk`（Framework 名），**不是** `import com.example.login.sdk...`（那是 Kotlin 包名）。
+
+| 现象 | 处理 |
+|------|------|
+| Swift: `No such module 'LoginSdk'` | Framework 未生成 → 先跑 `./scripts/build-ios-framework.sh` |
+| Gradle: `Unresolved reference 'LoginSDK'` | 看完整 Gradle 日志；常见原因：JDK 非 17、无 Android SDK、网络拉依赖失败 |
+| Xcode 跳过 Gradle 构建 | 已修复：仅当 Framework **已存在** 时才跳过；删 Framework 后重编 |
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+chmod +x gradlew
+./scripts/build-ios-framework.sh
+open ios-host/ios-host.xcodeproj
+```
 
 ### Build Phase 报 gradlew not found
 
