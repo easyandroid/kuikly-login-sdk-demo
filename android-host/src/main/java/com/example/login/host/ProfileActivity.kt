@@ -8,7 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import com.example.login.host.ui.screen.ProfileScreen
 import com.example.login.host.ui.theme.LoginSdkDemoTheme
+import com.example.login.sdk.api.LoginCallback
+import com.example.login.sdk.api.LoginError
 import com.example.login.sdk.api.LoginSDK
+import com.example.login.sdk.auth.LoginSession
 import kotlinx.coroutines.launch
 
 class ProfileActivity : ComponentActivity() {
@@ -17,7 +20,7 @@ class ProfileActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val session = LoginSDK.currentSession()
         if (session == null) {
-            startActivity(Intent(this, LoginActivity::class.java))
+            LoginSDK.launchLogin(reloginCallback)
             finish()
             return
         }
@@ -30,12 +33,27 @@ class ProfileActivity : ComponentActivity() {
                         lifecycleScope.launch {
                             LoginSDK.logout()
                             Toast.makeText(this@ProfileActivity, "已退出登录", Toast.LENGTH_SHORT).show()
-                            startActivity(Intent(this@ProfileActivity, LoginActivity::class.java))
+                            LoginSDK.launchLogin(reloginCallback)
                             finish()
                         }
                     },
                 )
             }
+        }
+    }
+
+    private val reloginCallback = object : LoginCallback {
+        override fun onSuccess(session: LoginSession) {
+            startActivity(Intent(this@ProfileActivity, ProfileActivity::class.java))
+        }
+
+        override fun onError(error: LoginError) {
+            Toast.makeText(this@ProfileActivity, error.message, Toast.LENGTH_LONG).show()
+            finish()
+        }
+
+        override fun onCancel() {
+            finish()
         }
     }
 }

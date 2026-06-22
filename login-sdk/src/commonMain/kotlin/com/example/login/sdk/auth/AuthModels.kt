@@ -17,6 +17,10 @@ enum class AuthMethod {
 sealed class LoginCredentials {
     data class PhoneOtp(val phone: String, val code: String) : LoginCredentials()
     data class EmailPassword(val email: String, val password: String) : LoginCredentials()
+    data class PhoneRegister(val phone: String, val code: String, val password: String) : LoginCredentials()
+    data class EmailRegister(val email: String, val password: String, val code: String) : LoginCredentials()
+    data class PhoneReset(val phone: String, val code: String, val newPassword: String) : LoginCredentials()
+    data class EmailReset(val email: String, val code: String, val newPassword: String) : LoginCredentials()
     data class ThirdParty(val method: AuthMethod) : LoginCredentials()
 }
 

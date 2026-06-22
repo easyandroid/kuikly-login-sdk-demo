@@ -1,0 +1,4 @@
+# 复制为 local.properties（勿提交 Git）
+# Windows 示例：
+sdk.dir=D\:\\Program Files\\Android\\Android Studio\\sdk
+# 或 Android SDK 实际安装路径

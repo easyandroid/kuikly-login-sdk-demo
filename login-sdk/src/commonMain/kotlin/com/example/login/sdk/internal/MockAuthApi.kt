@@ -36,6 +36,42 @@ class MockAuthApi : AuthApi {
         )
     }
 
+    override suspend fun registerWithPhone(phone: String, code: String, password: String): Result<LoginSession> {
+        delay(300)
+        if (code != "123456") return Result.failure(IllegalArgumentException("验证码错误"))
+        if (password.length < 6) return Result.failure(IllegalArgumentException("密码至少 6 位"))
+        return Result.success(mockSession(AuthMethod.PHONE, phone = phone, nickname = "新用户"))
+    }
+
+    override suspend fun registerWithEmail(email: String, password: String, code: String): Result<LoginSession> {
+        delay(300)
+        if (code != "123456") return Result.failure(IllegalArgumentException("验证码错误"))
+        if (password.length < 6) return Result.failure(IllegalArgumentException("密码至少 6 位"))
+        return Result.success(mockSession(AuthMethod.EMAIL, email = email, nickname = "新用户"))
+    }
+
+    override suspend fun resetPasswordWithPhone(
+        phone: String,
+        code: String,
+        newPassword: String,
+    ): Result<LoginSession> {
+        delay(300)
+        if (code != "123456") return Result.failure(IllegalArgumentException("验证码错误"))
+        if (newPassword.length < 6) return Result.failure(IllegalArgumentException("密码至少 6 位"))
+        return Result.success(mockSession(AuthMethod.PHONE, phone = phone))
+    }
+
+    override suspend fun resetPasswordWithEmail(
+        email: String,
+        code: String,
+        newPassword: String,
+    ): Result<LoginSession> {
+        delay(300)
+        if (code != "123456") return Result.failure(IllegalArgumentException("验证码错误"))
+        if (newPassword.length < 6) return Result.failure(IllegalArgumentException("密码至少 6 位"))
+        return Result.success(mockSession(AuthMethod.EMAIL, email = email))
+    }
+
     override suspend fun sendPhoneCode(phone: String): Result<Unit> {
         delay(200)
         if (phone.length < 11) return Result.failure(IllegalArgumentException("手机号格式错误"))

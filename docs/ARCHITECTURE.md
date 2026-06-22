@@ -122,7 +122,8 @@ com.example.login.sdk.internal     # Repository、Registry 实现、Mock
 
 | 集成点 | 预演实现 | Kuikly 正式实现 |
 |--------|----------|----------------|
-| 登录 UI | Jetpack Compose Activity | `@Page("login")` Kuikly Compose Page |
+| 登录 UI | `commonMain/LoginScreen`（Compose Multiplatform，Android/iOS 共用） | 可选迁移 Kuikly `@Page` |
+| 拉起登录 | `LoginSDK.launchLogin()` | **保持不变** |
 | UI 状态 | `StateFlow` + collect | Kuikly 响应式 `observable` |
 | 页面路由 | Intent 跳转 | `RouterModule` / `@Page` KSP 路由 |
 | 平台能力 | `ThirdPartyAuthLauncher` | Kuikly `Module` 机制 |

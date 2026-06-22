@@ -49,4 +49,39 @@ class LoginSdkTest {
 
         assertTrue(result is AuthResult.Failure)
     }
+
+    @Test
+    fun phoneRegister_withValidCode_succeeds() = kotlinx.coroutines.test.runTest {
+        LoginSDK.init(
+            LoginConfig(
+                appId = "test",
+                providers = listOf(PhoneAuthProvider()),
+            )
+        )
+
+        val result = LoginSDK.register(
+            AuthMethod.PHONE,
+            LoginCredentials.PhoneRegister("13900139000", "123456", "123456"),
+        )
+
+        assertTrue(result is AuthResult.Success)
+        assertNotNull(LoginSDK.currentSession())
+    }
+
+    @Test
+    fun phoneResetPassword_withValidCode_succeeds() = kotlinx.coroutines.test.runTest {
+        LoginSDK.init(
+            LoginConfig(
+                appId = "test",
+                providers = listOf(PhoneAuthProvider()),
+            )
+        )
+
+        val result = LoginSDK.resetPassword(
+            AuthMethod.PHONE,
+            LoginCredentials.PhoneReset("13800138000", "123456", "654321"),
+        )
+
+        assertTrue(result is AuthResult.Success)
+    }
 }

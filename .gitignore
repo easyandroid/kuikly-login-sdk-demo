@@ -4,3 +4,9 @@ local.properties
 *.iml
 .idea/
 .DS_Store
+
+# iOS / Xcode
+ios-host/Configuration/TeamID.xcconfig
+**/xcuserdata/
+*.xcuserstate
+DerivedData/

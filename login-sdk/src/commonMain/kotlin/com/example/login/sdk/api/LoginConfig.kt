@@ -1,6 +1,7 @@
 package com.example.login.sdk.api
 
 import com.example.login.sdk.auth.AuthApi
+import com.example.login.sdk.auth.AuthFeatureConfig
 import com.example.login.sdk.auth.AuthProvider
 import com.example.login.sdk.auth.TokenStore
 import com.example.login.sdk.internal.MockAuthApi
@@ -21,6 +22,10 @@ data class LoginConfig(
     val enabledMethods: Set<com.example.login.sdk.auth.AuthMethod>? = null,
     /** UI 主题配置 */
     val theme: LoginTheme = LoginTheme(),
+    /** 登录页 UI 行为（多 App 接入时可按宿主覆盖） */
+    val uiOptions: LoginUiOptions = LoginUiOptions(),
+    /** 账号能力开关：登录 / 注册 / 找回密码、手机 / 邮箱 / 第三方等 */
+    val featureConfig: AuthFeatureConfig = AuthFeatureConfig(),
 )
 
 data class LoginTheme(
@@ -28,4 +33,11 @@ data class LoginTheme(
     val showLogo: Boolean = true,
     val privacyPolicyUrl: String = "",
     val termsOfServiceUrl: String = "",
+)
+
+data class LoginUiOptions(
+    /** Demo 预填测试账号（生产环境保持 false） */
+    val prefillDemoCredentials: Boolean = false,
+    /** 是否展示 Demo 提示文案 */
+    val showDemoHint: Boolean = false,
 )

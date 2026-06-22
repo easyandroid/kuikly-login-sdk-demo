@@ -42,7 +42,28 @@ graph LR
 | **运行时** | Kotlin Native / JVM AOT | Flutter Engine + Dart VM | JS 引擎 + WebView |
 | **跨层通信** | Bridge methodId（主路径无 JSON 解析） | Platform Channel | JSBridge / postMessage |
 | **嵌入产物** | `.aar` / `.framework` / `.so` | Flutter Module + Engine | JS Bundle + WebView 容器 |
-| **鸿蒙原生** | ✅ 正式支持 | ⚠️ 支持有限 | ⚠️ 依赖 WebView |
+| **鸿蒙原生** | ✅ 正式支持（Kuikly 路线） | ⚠️ 支持有限 | ⚠️ 依赖 WebView |
+
+### 2.1 平台覆盖范围（选型维度）
+
+> **注意**：本节对比的是**技术方案能力**；**本预演工程当前仅 Android 可完整运行**（见 §6）。
+
+| 平台 | Kuikly / KMP（本方案） | Flutter | H5 WebView SDK |
+|------|------------------------|---------|----------------|
+| **Android App** | ✅ 当前 Demo 可跑 | ✅ 成熟 | ✅ 嵌入宿主 WebView |
+| **iOS App** | ⚠️ KMP 已配置 target，Provider 为占位 | ✅ 成熟 | ✅ 嵌入宿主 WebView |
+| **鸿蒙 App** | ✅ Kuikly 官方路线（待接入） | ⚠️ 有限 | ⚠️ 依赖 WebView |
+| **Web 浏览器（独立站点）** | ❌ 本工程无 `js`/`wasm` target | ✅ Flutter Web 官方支持 | ✅ 原生场景 |
+
+**Web 相关说明（易混淆）：**
+
+| 场景 | 本 KMP 方案 | Flutter | H5 |
+|------|-------------|---------|-----|
+| 宿主 App 内嵌登录页（WebView） | 可做，但非本仓库能力 | 可做 Module | ✅ 最典型 |
+| 独立 Web 站点 / SPA | ❌ 需另做 JS SDK 或等 Kuikly Web | ✅ `flutter build web` | ✅ 天然支持 |
+| 与 `login-sdk` 代码复用 | commonMain 逻辑可抽协议对齐 | Dart 独立实现 | TS/JS 独立实现 |
+
+**结论**：若核心诉求包含 **Web 浏览器端**，Flutter 或独立 H5 SDK 比当前 KMP 预演更易落地；KMP/Kuikly 优势在 **原生 App 嵌入（轻、快）+ 鸿蒙**。
 
 ---
 
@@ -137,7 +158,8 @@ graph LR
 | 交互体验 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
 | 第三方登录可靠性 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
 | 内存 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| 跨端 UI 一致性 | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| 跨端 UI 一致性（App 内） | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Web 浏览器端** | ⭐（本工程未实现） | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
 | 鸿蒙原生支持 | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | 开发栈统一（Kotlin） | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ |
 
@@ -150,7 +172,13 @@ graph LR
 > - **Flutter**：UI 一致性好，但 Engine 太重，嵌入多个宿主 App 包体惩罚大
 > - **Kuikly / KMP**：原生渲染，体积和启动接近原生；业务逻辑跨端共享；鸿蒙支持最好
 
-**推荐**：Android 先行 + 后期 iOS / 鸿蒙复用，优先 Kuikly/KMP 路线。
+**推荐**：
+
+| 诉求 | 推荐路线 |
+|------|----------|
+| 原生 App 嵌入、小包体、鸿蒙、Kotlin 栈统一 | **Kuikly / KMP**（本工程方向） |
+| App + **Web 浏览器** 一套 UI、尽快全端交付 | **Flutter** 或 **H5 + 后端协议对齐** |
+| 仅 Web 站点登录 | **H5 / Flutter Web**，不直接复用本仓库 `login-sdk` |
 
 ---
 
@@ -158,10 +186,13 @@ graph LR
 
 | 项 | 说明 |
 |----|------|
-| **当前 Demo** | KMP + Jetpack Compose，性能 ≈ 原生 Android |
-| **迁移 Kuikly 后** | UI 走 Kuikly 原生 Render，性能仍优于 Flutter / H5 |
-| **预演范围** | 架构验证；**尚未做正式 Benchmark** |
-| **数据依据** | Kuikly 官方 AOT 体积数据 + 业界 Flutter / H5 嵌入 SDK 的已知特征 |
+| **当前可运行** | 仅 **Android**（`android-host` + Jetpack Compose UI） |
+| **iOS** | KMP 已配置 `ios*` target，`iosMain` Provider 为 **Stub 占位**，无 iOS 宿主 Demo |
+| **Web** | **未实现**（`build.gradle.kts` 无 `js` / `wasmJs` target） |
+| **Kuikly** | 文档与 API 已预留（`LoginUiContract`），**代码中尚未接入** Kuikly Render |
+| **性能特征（Android）** | KMP + Compose ≈ 原生 Android；迁移 Kuikly Page 后预期仍优于 Flutter / H5 嵌入 |
+| **预演范围** | 架构验证；**尚未做正式 Benchmark**（B1~B5 见 §7） |
+| **数据依据** | Kuikly 官方 AOT 体积数据 + 业界 Flutter / H5 嵌入 SDK 的已知特征；**非本仓库实测** |
 
 ---
 

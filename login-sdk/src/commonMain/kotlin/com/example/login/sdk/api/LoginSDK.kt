@@ -7,10 +7,12 @@ import com.example.login.sdk.auth.AuthResult
 import com.example.login.sdk.auth.LoginCredentials
 import com.example.login.sdk.auth.LoginSession
 import com.example.login.sdk.auth.TokenStore
+import com.example.login.sdk.internal.LoginCallbackHolder
 import com.example.login.sdk.internal.DefaultAuthProviderRegistry
 import com.example.login.sdk.internal.DefaultLoginRepository
 import com.example.login.sdk.internal.InMemoryTokenStore
 import com.example.login.sdk.internal.LoginRepository
+import com.example.login.sdk.internal.resolveAvailableMethods
 import com.example.login.sdk.ui.LoginUiContract
 import com.example.login.sdk.ui.LoginUiState
 import kotlinx.coroutines.flow.StateFlow
@@ -48,10 +50,10 @@ object LoginSDK {
         registry.register(provider)
     }
 
-    /** 获取当前可用登录方式（按平台过滤后） */
+    /** 获取当前可用登录方式（按平台与能力配置过滤后） */
     fun availableMethods(): List<AuthMethod> {
         ensureInit()
-        return registry.availableMethods()
+        return resolveAvailableMethods(registry, config.featureConfig, config.enabledMethods)
     }
 
     /** 是否已登录 */
@@ -70,6 +72,18 @@ object LoginSDK {
     suspend fun login(method: AuthMethod, credentials: LoginCredentials): AuthResult {
         ensureInit()
         return repository.login(method, credentials)
+    }
+
+    /** 注册（注册成功后会话写入 TokenStore） */
+    suspend fun register(method: AuthMethod, credentials: LoginCredentials): AuthResult {
+        ensureInit()
+        return repository.register(method, credentials)
+    }
+
+    /** 找回密码 / 重置密码 */
+    suspend fun resetPassword(method: AuthMethod, credentials: LoginCredentials): AuthResult {
+        ensureInit()
+        return repository.resetPassword(method, credentials)
     }
 
     /** 发送验证码（手机号 / 邮箱） */
@@ -93,7 +107,23 @@ object LoginSDK {
     /** 创建 UI 控制器（Kuikly Page / Compose 页面共用） */
     fun createLoginController(callback: LoginCallback): LoginUiContract {
         ensureInit()
-        return LoginUiController(repository, registry, callback)
+        return LoginUiController(
+            repository = repository,
+            registry = registry,
+            callback = callback,
+            featureConfig = config.featureConfig,
+            enabledMethods = config.enabledMethods,
+        )
+    }
+
+    /**
+     * 拉起 SDK 内置登录页（Android Activity / iOS ViewController）。
+     * 多 App 接入时推荐入口；登录成功后 [LoginCallback.onSuccess] 回调 [LoginSession]。
+     */
+    fun launchLogin(callback: LoginCallback) {
+        ensureInit()
+        LoginCallbackHolder.set(callback)
+        PlatformLoginLauncher.launch()
     }
 
     /** 读取 UI 状态流 */

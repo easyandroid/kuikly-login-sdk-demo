@@ -42,6 +42,10 @@ interface AuthApi {
     suspend fun loginWithPhone(phone: String, code: String): Result<LoginSession>
     suspend fun loginWithEmail(email: String, password: String): Result<LoginSession>
     suspend fun loginWithThirdParty(payload: ThirdPartyAuthPayload): Result<LoginSession>
+    suspend fun registerWithPhone(phone: String, code: String, password: String): Result<LoginSession>
+    suspend fun registerWithEmail(email: String, password: String, code: String): Result<LoginSession>
+    suspend fun resetPasswordWithPhone(phone: String, code: String, newPassword: String): Result<LoginSession>
+    suspend fun resetPasswordWithEmail(email: String, code: String, newPassword: String): Result<LoginSession>
     suspend fun sendPhoneCode(phone: String): Result<Unit>
     suspend fun sendEmailCode(email: String): Result<Unit>
     suspend fun refreshToken(refreshToken: String): Result<LoginSession>

@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 internal interface LoginRepository {
     suspend fun login(method: AuthMethod, credentials: LoginCredentials): AuthResult
+    suspend fun register(method: AuthMethod, credentials: LoginCredentials): AuthResult
+    suspend fun resetPassword(method: AuthMethod, credentials: LoginCredentials): AuthResult
     suspend fun sendVerificationCode(method: AuthMethod, target: String): Result<Unit>
     suspend fun logout(): Result<Unit>
     suspend fun refreshToken(): AuthResult
@@ -57,8 +59,7 @@ internal class DefaultLoginRepository(
                     authApi.loginWithThirdParty(payload).getOrThrow()
                 }
             }
-            tokenStore.save(session)
-            cachedSession = session
+            saveSession(session)
             AuthResult.Success(session)
         } catch (e: kotlinx.coroutines.CancellationException) {
             throw e
@@ -70,6 +71,50 @@ internal class DefaultLoginRepository(
                 else -> "NETWORK"
             }
             AuthResult.Failure(code, e.message ?: "登录失败")
+        }
+    }
+
+    override suspend fun register(method: AuthMethod, credentials: LoginCredentials): AuthResult {
+        return try {
+            val session = when (method) {
+                AuthMethod.PHONE -> {
+                    val cred = credentials as? LoginCredentials.PhoneRegister
+                        ?: return AuthResult.Failure("INVALID_CREDENTIALS", "请填写完整注册信息")
+                    authApi.registerWithPhone(cred.phone, cred.code, cred.password).getOrThrow()
+                }
+                AuthMethod.EMAIL -> {
+                    val cred = credentials as? LoginCredentials.EmailRegister
+                        ?: return AuthResult.Failure("INVALID_CREDENTIALS", "请填写完整注册信息")
+                    authApi.registerWithEmail(cred.email, cred.password, cred.code).getOrThrow()
+                }
+                else -> return AuthResult.Failure("PROVIDER_NOT_AVAILABLE", "注册不支持: $method")
+            }
+            saveSession(session)
+            AuthResult.Success(session)
+        } catch (e: Exception) {
+            AuthResult.Failure("NETWORK", e.message ?: "注册失败")
+        }
+    }
+
+    override suspend fun resetPassword(method: AuthMethod, credentials: LoginCredentials): AuthResult {
+        return try {
+            val session = when (method) {
+                AuthMethod.PHONE -> {
+                    val cred = credentials as? LoginCredentials.PhoneReset
+                        ?: return AuthResult.Failure("INVALID_CREDENTIALS", "请填写完整信息")
+                    authApi.resetPasswordWithPhone(cred.phone, cred.code, cred.newPassword).getOrThrow()
+                }
+                AuthMethod.EMAIL -> {
+                    val cred = credentials as? LoginCredentials.EmailReset
+                        ?: return AuthResult.Failure("INVALID_CREDENTIALS", "请填写完整信息")
+                    authApi.resetPasswordWithEmail(cred.email, cred.code, cred.newPassword).getOrThrow()
+                }
+                else -> return AuthResult.Failure("PROVIDER_NOT_AVAILABLE", "不支持: $method")
+            }
+            saveSession(session)
+            AuthResult.Success(session)
+        } catch (e: Exception) {
+            AuthResult.Failure("NETWORK", e.message ?: "重置密码失败")
         }
     }
 
@@ -102,11 +147,16 @@ internal class DefaultLoginRepository(
 
         return try {
             val newSession = authApi.refreshToken(refresh).getOrThrow()
-            tokenStore.save(newSession)
+            saveSession(newSession)
             AuthResult.Success(newSession)
         } catch (e: Exception) {
             AuthResult.Failure("NETWORK", e.message ?: "刷新失败")
         }
+    }
+
+    private suspend fun saveSession(session: LoginSession) {
+        tokenStore.save(session)
+        cachedSession = session
     }
 }
 

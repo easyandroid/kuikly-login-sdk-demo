@@ -1,0 +1,12 @@
+#include? "TeamID.xcconfig"
+
+PRODUCT_NAME = ios-host
+PRODUCT_BUNDLE_IDENTIFIER = com.example.login.host
+IPHONEOS_DEPLOYMENT_TARGET = 15.0
+SWIFT_VERSION = 5.0
+TARGETED_DEVICE_FAMILY = 1,2
+
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(SRCROOT)/../login-sdk/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)
+OTHER_LDFLAGS = $(inherited) -framework LoginSdk
+
+CODE_SIGN_STYLE = Automatic

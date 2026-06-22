@@ -6,6 +6,7 @@ serialization = "1.7.3"
 lifecycle = "2.8.7"
 activity = "1.9.3"
 compose-bom = "2024.10.01"
+compose-multiplatform = "1.7.3"
 junit = "4.13.2"
 
 [libraries]
@@ -29,3 +30,4 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
