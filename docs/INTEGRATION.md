@@ -17,7 +17,8 @@
 | 独立 SDK + 内置登录 UI | `login-sdk` 内置 `LoginActivity` / iOS Presenter，`launchLogin()` 一键拉起 |
 | 多 App 复用 | 各 App `implementation(login-sdk)`，分别 `init` + `launchLogin` |
 | 登录方式可扩展 | `AuthProvider` 策略模式，五种方式独立实现 |
-| UI 与业务解耦 | `LoginUiContract` 控制器 + `LoginSDK` Facade |
+| UI 与业务解耦 | `LoginUiContract` + 跨端 `SharedLoginScreen` / `LoginSdkApp` |
+| 跨端 UI 共享 | Compose Multiplatform（类似 Flutter 一套 UI 多端运行） |
 | 与 Kuikly 兼容 | UI 层可替换为 Kuikly Page，控制器/API 不变 |
 
 ### 1.2 支持的登录方式
@@ -338,14 +339,14 @@ LoginSDK.init(LoginConfig(appId = "...", authApi = KtorAuthApi("https://api.exam
 
 ## 6. Kuikly 正式接入路径
 
-当前 Demo 的 `LoginActivity` 使用 **Jetpack Compose** 渲染 UI。迁移到 Kuikly 时：
+当前 Demo 的登录 UI 在 **`login-sdk/commonMain`**，通过 Compose Multiplatform 跨端共享。Android / iOS / Web 宿主仅挂载 `LoginSdkApp()`。
 
 ### 6.1 UI 迁移
 
 | 现在（预演） | 正式（Kuikly） |
 |-------------|---------------|
-| `LoginActivity` + Jetpack Compose | `@Page` Kuikly Compose Page |
-| `collectAsStateWithLifecycle` | Kuikly 响应式绑定 |
+| `LoginSdkApp` + CMP 跨端 Compose | `@Page` + Kuikly `ComposeContainer` |
+| `SharedLoginScreen` 在 commonMain | 同一 Composable，换 Kuikly 容器 |
 | `LoginUiContract` | **保持不变** |
 
 ### 6.2 宿主容器接入
@@ -515,6 +516,7 @@ lifecycleScope.launch {
 - [Kuikly Android 工程接入](https://kuikly.tds.qq.com/QuickStart/android.html)
 - [Kuikly GitHub](https://github.com/Tencent-TDS/KuiklyUI)
 - 本工程架构详解：`docs/ARCHITECTURE.md`
+- 多 App 多栈方案：`docs/MULTI_APP_ARCHITECTURE.md`
 - SDK 开发维护：`docs/DEVELOPMENT.md`
 - 性能对比分析：`docs/PERFORMANCE.md`
 - SDK 分发与多端依赖：`docs/DISTRIBUTION.md`
