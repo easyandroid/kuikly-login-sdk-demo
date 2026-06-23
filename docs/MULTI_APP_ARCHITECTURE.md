@@ -354,6 +354,7 @@ login-sdk-platform-android:1.2.0
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Facade / Provider 内部分层 |
 | [PERFORMANCE.md](./PERFORMANCE.md) | KMP vs Flutter vs H5 |
 | [THIRD_PARTY_AUTH.md](./THIRD_PARTY_AUTH.md) | 微信 / Apple / Google |
+| [ACCOUNT_BROKER.md](./ACCOUNT_BROKER.md) | 401 刷新、ContentProvider 账号中转站 |
 
 ---
 

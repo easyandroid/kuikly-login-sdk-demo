@@ -45,6 +45,7 @@ open ios-host/ios-host.xcodeproj
     ├── DEVELOPMENT.md             # SDK 开发维护
     ├── ARCHITECTURE.md            # 架构详解
     ├── PERFORMANCE.md             # 性能对比
+    ├── ACCOUNT_BROKER.md          # 401 刷新 + 账号中转站
     └── THIRD_PARTY_AUTH.md        # 第三方登录
 ```
 
@@ -59,6 +60,7 @@ open ios-host/ios-host.xcodeproj
 | [架构设计](docs/ARCHITECTURE.md) | 分层、时序图、模块边界 |
 | [性能对比](docs/PERFORMANCE.md) | KMP vs Flutter vs H5 |
 | [第三方登录](docs/THIRD_PARTY_AUTH.md) | 微信/Apple/Google 生产接入 |
+| [账号中转站](docs/ACCOUNT_BROKER.md) | 401 自动刷新、ContentProvider Token 分发 |
 
 ## 核心 API
 
